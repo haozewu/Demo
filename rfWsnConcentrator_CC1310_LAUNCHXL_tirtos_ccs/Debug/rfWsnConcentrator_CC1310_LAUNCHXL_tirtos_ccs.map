@@ -1,7 +1,7 @@
 ******************************************************************************
                   TI ARM Linker PC v18.1.2                     
 ******************************************************************************
->> Linked Wed Aug 15 10:13:13 2018
+>> Linked Sat Oct 20 17:25:32 2018
 
 OUTPUT FILE NAME:   <rfWsnConcentrator_CC1310_LAUNCHXL_tirtos_ccs.out>
 ENTRY POINT SYMBOL: "ResetISR"  address: 00008f0d
@@ -1543,7 +1543,7 @@ MODULE SUMMARY
     +--+---------------------------------+-------+---------+---------+
        Total:                            3334    18452     1156   
                                                                   
-    C:\Users\Haoze\document\workspace_v8\tirtos_builds_CC1310_LAUNCHXL_release_ccs\Debug\configPkg\package\cfg\
+    C:\Users\Haoze\Documents\GitHub\Demo\tirtos_builds_CC1310_LAUNCHXL_release_ccs\Debug\configPkg\package\cfg\
        release_pem3.oem3                 832     1567      1778   
     +--+---------------------------------+-------+---------+---------+
        Total:                            832     1567      1778   
@@ -1613,7 +1613,7 @@ MODULE SUMMARY
     +--+---------------------------------+-------+---------+---------+
        Total:                            2026    960       0      
                                                                   
-    C:\Users\Haoze\document\workspace_v8\tirtos_builds_CC1310_LAUNCHXL_release_ccs\src\sysbios\rom_sysbios.aem3
+    C:\Users\Haoze\Documents\GitHub\Demo\tirtos_builds_CC1310_LAUNCHXL_release_ccs\src\sysbios\rom_sysbios.aem3
        rom_sysbios.obj                   2537    0         136    
     +--+---------------------------------+-------+---------+---------+
        Total:                            2537    0         136    

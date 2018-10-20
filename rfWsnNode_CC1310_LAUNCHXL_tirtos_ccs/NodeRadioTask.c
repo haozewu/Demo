@@ -66,10 +66,6 @@
 #include DeviceFamily_constructPath(driverlib/aon_batmon.h)
 #include DeviceFamily_constructPath(driverlib/trng.h)
 
-#ifdef FEATURE_BLE_ADV
-#include "ble_adv/BleAdv.h"
-#endif
-
 /***** Defines *****/
 #define NODERADIO_TASK_STACK_SIZE 1024
 #define NODERADIO_TASK_PRIORITY   3
@@ -79,9 +75,6 @@
 #define RADIO_EVENT_DATA_ACK_RECEIVED   (uint32_t)(1 << 1)
 #define RADIO_EVENT_ACK_TIMEOUT         (uint32_t)(1 << 2)
 #define RADIO_EVENT_SEND_FAIL           (uint32_t)(1 << 3)
-#ifdef FEATURE_BLE_ADV
-#define NODE_EVENT_UBLE                 (uint32_t)(1 << 4)
-#endif
 
 #define NODERADIO_MAX_RETRIES 2
 #define NORERADIO_ACK_TIMEOUT_TIME_MS (160)
@@ -166,21 +159,10 @@ uint8_t nodeRadioTask_getNodeAddr(void)
 
 static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 {
-#ifdef FEATURE_BLE_ADV
-    BleAdv_Params_t bleAdv_Params;
-    /* Set mulitclient mode for EasyLink */
-    EasyLink_setCtrl(EasyLink_Ctrl_MultiClient_Mode, 1);
-
-#endif
-
     EasyLink_Params easyLink_params;
     EasyLink_Params_init(&easyLink_params);
 
     easyLink_params.ui32ModType = RADIO_EASYLINK_MODULATION;
-#ifdef FEATURE_BLE_ADV
-    easyLink_params.pClientEventCb = &rfSwitchCallback;
-    easyLink_params.nClientEventMask = RF_ClientEventSwitchClientEntered;
-#endif
 
     /* Initialize EasyLink */
     if(EasyLink_init(&easyLink_params) != EasyLink_Status_Success){
@@ -219,19 +201,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
 
     /* Initialise previous Tick count used to calculate uptime for the TLM beacon */
     prevTicks = Clock_getTicks();
-
-#ifdef FEATURE_BLE_ADV
-    /* Initialize the Simple Beacon module wit default params */
-    BleAdv_Params_init(&bleAdv_Params);
-    bleAdv_Params.pfnPostEvtProxyCB = bleAdv_eventProxyCB;
-    bleAdv_Params.pfnUpdateTlmCB = bleAdv_updateTlmCB;
-    bleAdv_Params.pfnUpdateMsButtonCB = bleAdv_updateMsButtonCB;
-    bleAdv_Params.pfnAdvStatsCB = NodeTask_advStatsCB;
-    BleAdv_init(&bleAdv_Params);
-
-    /* initialize BLE advertisements to default to MS */
-    BleAdv_setAdvertiserType(BleAdv_AdertiserMs);
-#endif
 
     /* Enter main task loop */
     while (1)
@@ -293,12 +262,6 @@ static void nodeRadioTaskFunction(UArg arg0, UArg arg1)
             returnRadioOperationStatus(NodeRadioStatus_Failed);
         }
 
-#ifdef FEATURE_BLE_ADV
-        if (events & NODE_EVENT_UBLE)
-        {
-            uble_processMsg();
-        }
-#endif
     }
 }
 
@@ -368,11 +331,6 @@ static void sendDmPacket(struct DualModeSensorPacket sensorPacket, uint8_t maxNu
     {
         System_abort("EasyLink_transmit failed");
     }
-#if defined(Board_DIO30_SWPWR)
-    /* this was a blocking call, so Tx is now complete. Turn off the RF switch power */
-    PIN_setOutputValue(blePinHandle, Board_DIO30_SWPWR, 0);
-#endif
-
     /* Enter RX */
     if (EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success)
     {
@@ -387,11 +345,6 @@ static void resendPacket(void)
     {
         System_abort("EasyLink_transmit failed");
     }
-#if defined(Board_DIO30_SWPWR)
-    /* this was a blocking call, so Tx is now complete. Turn off the RF switch power */
-    PIN_setOutputValue(blePinHandle, Board_DIO30_SWPWR, 0);
-#endif
-
     /* Enter RX and wait for ACK with timeout */
     if (EasyLink_receiveAsync(rxDoneCallback, 0) != EasyLink_Status_Success)
     {
@@ -402,83 +355,10 @@ static void resendPacket(void)
     currentRadioOperation.retriesDone++;
 }
 
-#ifdef FEATURE_BLE_ADV
-/*********************************************************************
-* @fn      bleAdv_eventProxyCB
-*
-* @brief   Post an event to the application so that a Micro BLE Stack internal
-*          event is processed by Micro BLE Stack later in the application
-*          task's context.
-*
-* @param   None
-*
-* @return  None
-*/
-static void bleAdv_eventProxyCB(void)
-{
-    /* Post event */
-    Event_post(radioOperationEventHandle, NODE_EVENT_UBLE);
-}
-
-/*********************************************************************
-* @fn      bleAdv_updateTlmCB
-
-* @brief Callback to update the TLM data
-*
-* @param pvBatt Battery level
-* @param pTemp Current temperature
-* @param pTime100MiliSec time since boot in 100ms units
-*
-* @return  None
-*/
-static void bleAdv_updateTlmCB(uint16_t *pvBatt, uint16_t *pTemp, uint32_t *pTime100MiliSec)
-{
-    uint32_t currentTicks = Clock_getTicks();
-
-    //check for wrap around
-    if (currentTicks > prevTicks)
-    {
-        //calculate time since last reading in 0.1s units
-        *pTime100MiliSec += ((currentTicks - prevTicks) * Clock_tickPeriod) / 100000;
-    }
-    else
-    {
-        //calculate time since last reading in 0.1s units
-        *pTime100MiliSec += ((prevTicks - currentTicks) * Clock_tickPeriod) / 100000;
-    }
-    prevTicks = currentTicks;
-
-    *pvBatt = AONBatMonBatteryVoltageGet();
-    // Battery voltage (bit 10:8 - integer, but 7:0 fraction)
-    *pvBatt = (*pvBatt * 125) >> 5; // convert V to mV
-
-    *pTemp = adcData;
-}
-
-/*********************************************************************
-* @fn      bleAdv_updateMsButtonCB
-*
-* @brief Callback to update the MS button data
-*
-* @param pButton Button state to be added to MS beacon Frame
-*
-* @return  None
-*/
-static void bleAdv_updateMsButtonCB(uint8_t *pButton)
-{
-    *pButton = !PIN_getInputValue(Board_PIN_BUTTON0);
-}
-#endif
 
 static void rxDoneCallback(EasyLink_RxPacket * rxPacket, EasyLink_Status status)
 {
     struct PacketHeader* packetHeader;
-
-#if defined(Board_DIO30_SWPWR)
-    /* Rx is now complete. Turn off the RF switch power */
-    PIN_setOutputValue(blePinHandle, Board_DIO30_SWPWR, 0);
-#endif
-
     /* If this callback is called because of a packet received */
     if (status == EasyLink_Status_Success)
     {

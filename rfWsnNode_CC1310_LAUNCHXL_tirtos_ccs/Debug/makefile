@@ -6,10 +6,10 @@ SHELL = cmd.exe
 
 CG_TOOL_ROOT := C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS
 
-GEN_OPTS += C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/compiler.opt
-GEN_OPTS__FLAG := --cmd_file="C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/compiler.opt"
-GEN_CMDS += C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/linker.cmd
-GEN_CMDS__FLAG := -l"C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/linker.cmd"
+GEN_OPTS += C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/compiler.opt
+GEN_OPTS__FLAG := --cmd_file="C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/compiler.opt"
+GEN_CMDS += C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/linker.cmd
+GEN_CMDS__FLAG := -l"C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/configPkg/linker.cmd"
 
 ORDERED_OBJS += \
 "./CC1310_LAUNCHXL.obj" \
@@ -164,10 +164,10 @@ all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@$(MAKE) --no-print-directory -Onone "rfWsnNode_CC1310_LAUNCHXL_tirtos_ccs.out"
 
 dependents:
-	-cd C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug && $(MAKE) all
+	-cd C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug && $(MAKE) clean all
 
 # Tool invocations
-rfWsnNode_CC1310_LAUNCHXL_tirtos_ccs.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS) C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/tirtos_builds_CC1310_LAUNCHXL_release_ccs.lib
+rfWsnNode_CC1310_LAUNCHXL_tirtos_ccs.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS) C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/tirtos_builds_CC1310_LAUNCHXL_release_ccs.lib
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
 	"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/bin/armcl" -mv7M3 --code_state=16 --float_support=vfplib -me --define=DeviceFamily_CC13X0 --define=CCFG_FORCE_VDDR_HH=0 -g --diag_warning=225 --diag_warning=255 --diag_wrap=off --display_error_number --gen_func_subsections=on -z -m"rfWsnNode_CC1310_LAUNCHXL_tirtos_ccs.map" -i"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.2.LTS/lib" --diag_wrap=off --display_error_number --warn_sections --xml_link_info="rfWsnNode_CC1310_LAUNCHXL_tirtos_ccs_linkInfo.xml" --rom_model -o "rfWsnNode_CC1310_LAUNCHXL_tirtos_ccs.out" $(ORDERED_OBJS)
@@ -191,7 +191,7 @@ clean:
 
 .PHONY: all clean dependents
 .SECONDARY:
-C:/Users/Haoze/document/workspace_v8/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/tirtos_builds_CC1310_LAUNCHXL_release_ccs.lib:
+C:/Users/Haoze/Documents/GitHub/Demo/tirtos_builds_CC1310_LAUNCHXL_release_ccs/Debug/tirtos_builds_CC1310_LAUNCHXL_release_ccs.lib:
 
 -include ../makefile.targets
 
